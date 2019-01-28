@@ -3,6 +3,13 @@
 
 This project calibrates a front-facing vehicle camera and identifies lane lines from 1280x720 video shot on said camera.
 
+Limitations:
+* No city lanes
+* Limited elevation changes
+* No merge/diverge/split
+* No lane changes
+* No construction zones
+
 The goals / steps of this project are the following:
 *	Compute the camera calibration matrix and distortion coefficients given a set of chessboard images.
 *	Apply a distortion correction to raw images.
@@ -108,3 +115,13 @@ The method doAll() manages the whole transformation from start to finish. The ex
 The video is in/will be generated in “advLaneFindingUdacity/project_video_out.mp4”
 
 ## Discussion
+
+Some of the more challenging aspects of this project for me were the thresholding and sliding window search. Thresholding while being mindful of saturation changes due to changing pavement and shadows was difficult, as absolute saturation thresholding does not always work in these scenarios. I thought that by considering only localized pixels, my code improved a lot from what I had done in the last lane-finding project.
+
+Sliding window search was also difficult for me on dashed lane lines. Programming in the checks so that the search doesn’t fail in between lines was challenging. However, by falling back on previous lines in time, or following a solid line if available, I think my code does fairly well.
+
+Finally, code performance/speed was an issue that I struggled with initially. My initial method took 15 seconds to process a frame, but is now closer to 0.4 s. Most of these gains were realized by using numpy arrays instead of nested for loops.
+
+The pipeline could be improved by having more finely grained or continuous windows. The method I’m using has windows that don’t overlap, leading to inaccuracies. My pipeline also could better use the output from previous searches, searching in a tighter window around previous lane lines. Additionally, incorporating speed and steering angle data into the pipeline could be beneficial in informing initial guesses of lane lines.
+
+This code could fail for merging or diverging lanes, as well as exit lanes. Additionally, on city roads where there is not a strong lane marking on the shoulder, there could be a failure. Also, if the car is straddling a lane line, the initial guesses may fail, causing an unstable solution.
